@@ -4,7 +4,7 @@ module.exports = {
   entry: './src/client/index.ts',
   output: {
     filename: 'bundle.js',
-    path: __dirname + '/dist'
+    path: __dirname + '/docs'
   },
   plugins: [
     new CopyPlugin({
