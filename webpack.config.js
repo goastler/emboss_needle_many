@@ -8,7 +8,7 @@ module.exports = {
   },
   plugins: [
     new CopyPlugin({
-      patterns: [{ from: 'src/client/index.html', to: 'index.html' }, { from: 'src/client/CNAME', to: '' }]
+      patterns: [{ from: 'src/client/index.html', to: 'index.html' }]
     })
   ],
   module: {
