@@ -5,7 +5,7 @@ import express from 'express'
 const app = express()
 
 // serve static files from the 'dist' directory
-const pubDir = __dirname + '/../../dist'
+const pubDir = __dirname + '/../../docs'
 console.log('pubDir', pubDir)
 app.use(express.static(pubDir))
 
