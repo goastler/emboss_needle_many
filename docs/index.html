@@ -29,7 +29,7 @@
 </head>
 <body>
     <h1>Sequence Matcher</h1>
-    <p>Compare one sequence against multiple sequences, enabling mass sequence alignment. The output is the alignment output conducted one-by-one in the same order as the input sequences. The first alignment may have a noticeable delay. Empty lines will be filtered out so you can use padded input.</p>
+    <p>Compare one sequence against multiple sequences, enabling mass sequence alignment. The output is the alignment output conducted one-by-one in the same order as the input sequences. The first alignment may have a noticeable delay. Empty lines will be filtered out so you can use padded input. Uses <a href="https://www.ebi.ac.uk/jdispatcher/psa/emboss_needle">ebi's</a> emboss_needle aligner.</p>
     <h3>Input:</h3>
     <form id="form" action="/submit" method="post">
         <label for="a">One sequence: (a single sequence OR fasta format)</label>
