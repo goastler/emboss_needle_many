@@ -1,3 +1,4 @@
+
 // const isFinished = async (id: string): Promise<boolean> => {
 //     const res = await fetch("https://www.ebi.ac.uk/Tools/services/rest/emboss_needle/status/emboss_needle-I20240202-104914-0356-44799083-p1m", {
 //         "headers": {
@@ -26,7 +27,7 @@
 //     throw new Error(`unexpected status: ${data}`)
 // }
 
-const run = async (a: string, b: string) => {
+const submit = async (a: string, b: string) => {
     const res = await fetch("https://www.ebi.ac.uk/Tools/services/rest/emboss_needle/run", {
         "headers": {
           "accept": "application/json, text/plain, */*",
@@ -44,12 +45,6 @@ const run = async (a: string, b: string) => {
     if(res.status !== 200) throw new Error(`got status ${res.status} from run endpoint: ${await res.text()}`)
     const data = await res.text()
     return data
-}
-
-const submitJob = (a: string, b: string, index: number) => {
-    return {
-        a, b, idPromise: run(a, b), index
-    }
 }
 
 const result = async (id: string): Promise<string> => {
@@ -76,6 +71,7 @@ const result = async (id: string): Promise<string> => {
             res = await fetch(url, options);
         } catch(e) {
             // discard
+            console.log('error fetching result', e)
         }
         i++
     }
@@ -102,69 +98,39 @@ const detectSequences = (bsInput: string) => {
     return bs
 }
 
-export const submit = async (aInput: string, bsInput: string, cb: (a: string, b: string, out: string, index: number, total: number) => void) => {
-    const a = aInput.trim()
-    const bs = detectSequences(bsInput)
-    console.log('bs:\n', bs.map((b, i) => i + ': ' + b).join('\n'))
+export interface Input {
+    aSeqs: string;
+    bSeqs: string;
+}
 
-    const jobs = bs.map((b, i) => submitJob(a, b, i))
-    for(const job of jobs) {
-        let r = 'unknown error'
-        try {
-            const id = await job.idPromise
-            try {
-                r = await result(id)
-            } catch(e) {
-                // failed to get result
-                r = 'failed to get result for ' + id + ':' + String(e)
-            }
-        } catch(e) {
-            // failed to submit job
-            r = 'failed to submit job: ' + String(e)
+export interface Output {
+    out: string;
+    aSeq: string;
+    bSeq: string;
+    key: number;
+}
+
+export const run = (input: Input): Promise<Output>[] => {
+    // remove empty sequences
+    const aSeqs = detectSequences(input.aSeqs)
+    const bSeqs = detectSequences(input.bSeqs)
+
+    const proms: Promise<Output>[] = []
+    for(let i = 0, k = 0; i < aSeqs.length; i++) {
+        for(let j = 0; j < bSeqs.length; j++, k++) {
+            const a = aSeqs[i]
+            const b = bSeqs[j]
+            const key = k
+            proms.push(new Promise(async (resolve, reject) => {
+                try {
+                    const id = await submit(a, b)
+                    let out = (await result(id))//.replace(/ /g, '\u00a0').replace(/\n/g, '\u000a')
+                    resolve({out, aSeq: a, bSeq: b, key})
+                } catch(e) {
+                    reject(e)
+                }
+            }))
         }
-        cb(job.a, job.b, r, job.index, jobs.length)
     }
+    return proms
 }
-
-function scrollToBottom() {
-    window.scrollTo(0, document.body.scrollHeight);
-}
-
-const getElementById = (id: string) => {
-    const el = document.getElementById(id) as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement | null;
-    if(el === null || el === undefined) {
-        throw new Error(`element with id ${id} not found`);
-    }
-    return el;
-}
-
-function submitForm() {
-    // Get form data
-    const formData = {
-        a: getElementById('a').value,
-        b: getElementById('b').value,
-    };
-
-    getElementById('output').innerText = '';
-    getElementById('status').innerText = `Processing... 1 / ${detectSequences(formData.b).length} - 0%`;
-
-    submit(formData.a, formData.b, (a: string, b: string, out: string, index: number, total: number) => {
-        console.log('callback', a, b, out, index, total)
-        getElementById('output').innerHTML += `<div><pre>${out}</pre></div>`;
-        if(index === total - 1) {
-            getElementById('status').innerText = `Processed ${total} / ${total} - 100% - Done!`;
-        } else {
-            getElementById('status').innerText = `Processing... ${index + 1} / ${total} - ${(index + 1) / total * 100}%`;
-        }
-        // scrollToBottom();
-    });
-    
-}
-
-document.addEventListener('DOMContentLoaded', function () {
-    getElementById('form').addEventListener('submit', function (event) {
-        event.preventDefault(); // Prevent the default form submission
-
-        submitForm();
-    });
-});
