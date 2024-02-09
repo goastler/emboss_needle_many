@@ -107,6 +107,7 @@ export interface Output {
     out: string;
     aSeq: string;
     bSeq: string;
+    key: number;
 }
 
 export const run = (input: Input): Promise<Output>[] => {
@@ -115,15 +116,16 @@ export const run = (input: Input): Promise<Output>[] => {
     const bSeqs = detectSequences(input.bSeqs)
 
     const proms: Promise<Output>[] = []
-    for(let i = 0; i < aSeqs.length; i++) {
-        for(let j = 0; j < bSeqs.length; j++) {
+    for(let i = 0, k = 0; i < aSeqs.length; i++) {
+        for(let j = 0; j < bSeqs.length; j++, k++) {
             const a = aSeqs[i]
             const b = bSeqs[j]
+            const key = k
             proms.push(new Promise(async (resolve, reject) => {
                 try {
                     const id = await submit(a, b)
-                    const out = (await result(id)).replace('\n', '\r\n')
-                    resolve({out, aSeq: a, bSeq: b})
+                    let out = (await result(id))//.replace(/ /g, '\u00a0').replace(/\n/g, '\u000a')
+                    resolve({out, aSeq: a, bSeq: b, key})
                 } catch(e) {
                     reject(e)
                 }

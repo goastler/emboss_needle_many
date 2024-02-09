@@ -7,11 +7,9 @@ export interface ResultProps {
     key: number
 }
 
-const Result: React.FC<ResultProps> = ({output, error, key}) => {
-    const id = 'result' + key
+const Result: React.FC<ResultProps> = ({output, error}) => {
+    const id = 'result' + output.key
     const text = error ? error.message : output.out
-
-    console.log(JSON.stringify(output.out, null, 2))
 
     const copy = () => {
         // Save the current scroll position
@@ -46,12 +44,14 @@ const Result: React.FC<ResultProps> = ({output, error, key}) => {
         if(el === null) {
             throw new Error(`element with id ${id} not found`);
         }
-        // find the start position of the "# Length" line
-        const start = el.firstElementChild!.innerHTML.indexOf('# Length');
         // Create a range and select the contents of the <div>
         const range = document.createRange();
-        range.setStart(el.firstChild!, start);
-        range.setEnd(el.firstChild!, el.innerHTML.length);
+        range.selectNodeContents(el);
+        // find the '# Length' line
+        const start = el.innerHTML.indexOf('# Length')
+        // set the range
+        range.setStart(el.firstChild!, start)
+        range.setEnd(el.firstChild!, el.innerHTML.length)
         const selection = window.getSelection();
         if(selection === null) {
             throw new Error('window.getSelection() returned null');
@@ -61,7 +61,7 @@ const Result: React.FC<ResultProps> = ({output, error, key}) => {
     
         // Copy the selected contents to the clipboard
         document.execCommand('copy');
-
+   
         // Restore the scroll position
         window.scrollTo(0, scrollY);
     }
@@ -76,8 +76,8 @@ const Result: React.FC<ResultProps> = ({output, error, key}) => {
             <div className="monospace">
                 {output.bSeq}
             </div>
-            <div id={id}>
-                <pre>
+            <div >
+                <pre id={id}>
                     {text}
                 </pre>
             </div>

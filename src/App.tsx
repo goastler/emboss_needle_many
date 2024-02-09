@@ -1,16 +1,40 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Result from './Result';
 import { Output, run } from './align';
 
 const App: React.FC = () => {
 
+    const aLabel = 'a'
+    const bLabel = 'b'
     const [a, setA] = React.useState("");
     const [b, setB] = React.useState("");
     const [results, setResults] = React.useState<(JSX.Element)[]>([]);
     const [submitDisabled, setSubmitDisabled] = React.useState<boolean>(false);
     const [maxProgress, setMaxProgress] = React.useState<number>(0);
     const [progress, setProgress] = React.useState<number>(0);
-    
+
+    useEffect(() => {
+        const savedValue = localStorage.getItem(aLabel);
+        if (savedValue) {
+            setA(savedValue);
+        }
+    }, []);
+
+    useEffect(() => {
+        localStorage.setItem(aLabel, a);
+    }, [a]);
+
+    useEffect(() => {
+        const savedValue = localStorage.getItem(bLabel);
+        if (savedValue) {
+            setB(savedValue);
+        }
+    }, []);
+
+    useEffect(() => {
+        localStorage.setItem(bLabel, b);
+    }, [b]);
+
     const handleA = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         setA(e.target.value);
     }
