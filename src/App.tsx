@@ -125,8 +125,11 @@ const App: React.FC = () => {
 
         // setResult(content)
 
+        // make a temp el
+        const tempEl = document.createElement('div')
+        tempEl.innerHTML = content
         // select all spans in the div
-        const spans = el.getElementsByTagName('span')
+        const spans = tempEl.getElementsByTagName('span')
         // concat all the spans
         let text = ''
         for(let i = 0; i < spans.length; i++) {
