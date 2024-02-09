@@ -150,13 +150,13 @@ function submitForm() {
 
     submit(formData.a, formData.b, (a: string, b: string, out: string, index: number, total: number) => {
         console.log('callback', a, b, out, index, total)
-        getElementById('output').innerText += out;
+        getElementById('output').innerText += `<div><pre>${out}</pre></div>`;
         if(index === total - 1) {
             getElementById('status').innerText = `Processed ${total} / ${total} - 100% - Done!`;
         } else {
             getElementById('status').innerText = `Processing... ${index + 1} / ${total} - ${(index + 1) / total * 100}%`;
         }
-        scrollToBottom();
+        // scrollToBottom();
     });
     
 }
