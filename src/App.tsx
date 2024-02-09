@@ -193,6 +193,7 @@ EMBOSS_001         1 -------agctagctagta     12
         setSubmitDisabled(true);
         setProgress(0);
         setMaxProgress(0);
+        setResult('');
         const proms = run({
             aSeqs: a,
             bSeqs: b
@@ -251,33 +252,46 @@ EMBOSS_001         1 -------agctagctagta     12
         let i = 0
         let started = false
         let start = 0
-        for(const line of el.innerHTML.split('\n')) {
+        let indices: number[] = []
+        let j = 0
+        const lines = el.innerHTML.split('\n')
+        for(const line of lines) {
             if(line.startsWith('# Length')) {
                 start = i
                 started = true
+                console.log('start', start, i, j, line)
             } else if(line === '########################################' && started) {
                 const end = i
-                // Create a range and select the contents of the <div>
-                const range = document.createRange();
-                range.selectNodeContents(el);
-                console.log(start, end)
-                // set the range
-                range.setStart(el.firstChild!.firstChild!, start)
-                range.setEnd(el.firstChild!.firstChild!, end)
-                const selection = window.getSelection();
-                if(selection === null) {
-                    throw new Error('window.getSelection() returned null');
-                }
-                selection.addRange(range);
+                indices.push(start - '<pre>'.length)
+                indices.push(end - '<pre>'.length)
                 started = false
+                console.log('end', end, i, j, line)
             }
             i += line.length + 1
+            j++
+        }
+        if(lines.length > 0 && started) {
+            indices.push(start)
+            indices.push(i - '</pre>'.length - 1)
+        }
+        console.log(indices)
+        
+        for(let i = 0; i < indices.length; i += 2) {
+            console.log(el.innerHTML.slice(indices[i], indices[i+1]))
+            const range = document.createRange();
+            range.setStart(el.firstChild!.firstChild!, indices[i])
+            range.setEnd(el.firstChild!.firstChild!, indices[i+1])
+            const selection = window.getSelection();
+            if(selection === null) {
+                throw new Error('window.getSelection() returned null');
+            }
+            selection.addRange(range);
         }
 
-        document.execCommand('copy');
+        // document.execCommand('copy');
 
         // Restore the scroll position
-        window.scrollTo(0, scrollY);
+        // window.scrollTo(0, scrollY);
     }
 
     return (
