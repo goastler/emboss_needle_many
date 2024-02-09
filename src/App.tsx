@@ -184,7 +184,7 @@ EMBOSS_001         1 -------agctagctagta     12
         setB(e.target.value);
     }
 
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         if(submitDisabled) {
             // already processing
@@ -199,15 +199,12 @@ EMBOSS_001         1 -------agctagctagta     12
             bSeqs: b
         });
         setMaxProgress(proms.length);
-        proms.forEach((prom, i) => {
-            prom.then(output => {
-                setProgress(progress => progress + 1);
-                setResult(result => result + '\n\n' + output.out);
-            })
-        });
-        Promise.all(proms).then(() => {
-            setSubmitDisabled(false);
-        });
+        for(const prom of proms) {
+            const output = await prom;
+            setProgress(progress => progress + 1);
+            setResult(result => result + '\n\n' + output.out);
+        }
+        setSubmitDisabled(false);
     }
 
     const percProgress = maxProgress === 0 ? 0 : Math.round(progress / maxProgress * 100);
