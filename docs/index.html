@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Static HTML Page</title>
+    <title>Sequence Matcher</title>
     <style>
         body {
             font-family: sans;
@@ -47,7 +47,8 @@
     <script src="bundle.js"></script>
 </head>
 <body>
-    <h1>Sequence Matcher</h1>
+    <div id="root"></div>
+    <!-- <h1>Sequence Matcher</h1>
     <p>Compare one sequence against multiple sequences, enabling mass sequence alignment. The output is the alignment output conducted one-by-one in the same order as the input sequences. The first alignment may have a noticeable delay. Empty lines will be filtered out so you can use padded input. Uses <a href="https://www.ebi.ac.uk/jdispatcher/psa/emboss_needle">ebi's</a> emboss_needle aligner.</p>
     <h3>Input:</h3>
     <form id="form" action="/submit" method="post">
@@ -82,57 +83,13 @@
             </div>
             <br/>
             <hr/>
-        <!-- </div>
-# Program: needle
-# Rundate: Fri  9 Feb 2024 09:37:40
-# Commandline: needle
-#    -auto
-#    -stdout
-#    -asequence emboss_needle-I20240209-093729-0577-58204444-p1m.asequence
-#    -bsequence emboss_needle-I20240209-093729-0577-58204444-p1m.bsequence
-#    -datafile EDNAFULL
-#    -gapopen 10.0
-#    -gapextend 0.5
-#    -endopen 10.0
-#    -endextend 0.5
-#    -aformat3 pair
-#    -snucleotide1
-#    -snucleotide2
-# Align_format: pair
-# Report_file: stdout
-########################################
-
-#=======================================
-#
-# Aligned_sequences: 2
-# 1: EMBOSS_001
-# 2: EMBOSS_001
-# Matrix: EDNAFULL
-# Gap_penalty: 10.0
-# Extend_penalty: 0.5
-#
-# Length: 13
-# Identity:       9/13 (69.2%)
-# Similarity:     9/13 (69.2%)
-# Gaps:           4/13 (30.8%)
-# Score: 35.0
-# 
-#
-#=======================================
-
-EMBOSS_001         1 aaaaaacccgtct     13
-                        |||||| |||
-EMBOSS_001         1 ---aaaccc-tct      9
-
-
-#---------------------------------------
-#--------------------------------------- -->
+        </div>
     </div>
     <br/>
     <div class="sticky-footer">
         <h3>Status:</h3>
         <div id="status">Idle</div>
         <br/>
-    </div>
+    </div> -->
 </body>
 </html>
