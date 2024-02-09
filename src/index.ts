@@ -1,3 +1,5 @@
+import "./styles/index.css";
+
 // const isFinished = async (id: string): Promise<boolean> => {
 //     const res = await fetch("https://www.ebi.ac.uk/Tools/services/rest/emboss_needle/status/emboss_needle-I20240202-104914-0356-44799083-p1m", {
 //         "headers": {
