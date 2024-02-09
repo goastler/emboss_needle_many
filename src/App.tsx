@@ -262,8 +262,8 @@ EMBOSS_001         1 -------agctagctagta     12
                 console.log('start', start, i, j, line)
             } else if(line === '########################################' && started) {
                 const end = i
-                indices.push(start - '<pre>'.length)
-                indices.push(end - '<pre>'.length)
+                indices.push(start)
+                indices.push(end)
                 started = false
                 console.log('end', end, i, j, line)
             }
@@ -272,7 +272,7 @@ EMBOSS_001         1 -------agctagctagta     12
         }
         if(lines.length > 0 && started) {
             indices.push(start)
-            indices.push(i - '</pre>'.length - 1)
+            indices.push(el.firstChild!.textContent!.length)
         }
         console.log(indices)
         
