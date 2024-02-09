@@ -200,9 +200,13 @@ EMBOSS_001         1 -------agctagctagta     12
         });
         setMaxProgress(proms.length);
         for(const prom of proms) {
-            const output = await prom;
+            try {
+                const output = await prom;
+                setResult(result => result + '\n\n' + output.out);
+            } catch(e) {
+                setResult(result => result + '\n\n' + (e instanceof Error ? e.message : String(e)));
+            }
             setProgress(progress => progress + 1);
-            setResult(result => result + '\n\n' + output.out);
         }
         setSubmitDisabled(false);
     }
@@ -237,58 +241,57 @@ EMBOSS_001         1 -------agctagctagta     12
     }
 
     const copyAlignment = () => {
-        // Save the current scroll position
-        const scrollY = window.scrollY;
-
         const el = document.getElementById(id)
         if(el === null) {
             throw new Error(`element with id ${id} not found`);
         }
+        const original = el.innerHTML
 
-        window.getSelection()?.removeAllRanges();
-        let i = 0
-        let started = false
-        let start = 0
-        let indices: number[] = []
-        let j = 0
-        const lines = el.innerHTML.split('\n')
-        for(const line of lines) {
-            if(line.startsWith('# Length')) {
-                start = i
-                started = true
-                console.log('start', start, i, j, line)
-            } else if(line === '########################################' && started) {
-                const end = i
-                indices.push(start)
-                indices.push(end)
-                started = false
-                console.log('end', end, i, j, line)
+        const targetStart = '# Length: '
+        const targetEnd = '#---------------------------------------\n#---------------------------------------'
+        for(let i = 0; i < el.innerHTML.length; i++) {
+            if(el.innerHTML.substring(i, i + targetStart.length) === targetStart) {
+                // insert a span tag
+                const span = `<span style="background-color: yellow;">`
+                el.innerHTML = el.innerHTML.slice(0, i) + span + el.innerHTML.slice(i)
+                i += span.length + targetStart.length
             }
-            i += line.length + 1
-            j++
-        }
-        if(lines.length > 0 && started) {
-            indices.push(start)
-            indices.push(el.firstChild!.textContent!.length)
-        }
-        console.log(indices)
-        
-        for(let i = 0; i < indices.length; i += 2) {
-            console.log(el.innerHTML.slice(indices[i], indices[i+1]))
-            const range = document.createRange();
-            range.setStart(el.firstChild!.firstChild!, indices[i])
-            range.setEnd(el.firstChild!.firstChild!, indices[i+1])
-            const selection = window.getSelection();
-            if(selection === null) {
-                throw new Error('window.getSelection() returned null');
+            if(el.innerHTML.substring(i, i + targetEnd.length) === targetEnd) {
+                // insert a span tag
+                const span = `</span>`
+                el.innerHTML = el.innerHTML.slice(0, i + targetEnd.length) + span + el.innerHTML.slice(i + targetEnd.length)
+                i += span.length + targetEnd.length
             }
-            selection.addRange(range);
         }
 
-        // document.execCommand('copy');
+        // select all spans in the div
+        const spans = el.getElementsByTagName('span')
+        // concat all the spans
+        let text = ''
+        for(let i = 0; i < spans.length; i++) {
+            text += spans[i].textContent + '\n\n\n'
+        }
+        console.log(text)
 
-        // Restore the scroll position
-        // window.scrollTo(0, scrollY);
+        // make a temporary element with same formatting as the div
+        const temp = document.createElement('pre')
+        temp.innerHTML = text
+        document.body.appendChild(temp)
+
+        // select the text
+        const range = document.createRange()
+        range.selectNode(temp)
+        const selection = window.getSelection()!
+        selection.removeAllRanges()
+        selection.addRange(range)
+        // copy
+        document.execCommand('copy')
+        // remove the temporary element
+        document.body.removeChild(temp)
+
+        setTimeout(() => {
+            el.innerHTML = original
+        }, 3000)
     }
 
     return (
