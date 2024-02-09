@@ -104,24 +104,26 @@ const App: React.FC = () => {
         if(el === null) {
             throw new Error(`element with id ${id} not found`);
         }
-        const original = el.innerHTML
+        let content = result
 
         const targetStart = '# Length: '
         const targetEnd = '#---------------------------------------\n#---------------------------------------'
-        for(let i = 0; i < el.innerHTML.length; i++) {
-            if(el.innerHTML.substring(i, i + targetStart.length) === targetStart) {
+        for(let i = 0; i < content.length; i++) {
+            if(content.substring(i, i + targetStart.length) === targetStart) {
                 // insert a span tag
                 const span = `<span style="background-color: yellow;">`
-                el.innerHTML = el.innerHTML.slice(0, i) + span + el.innerHTML.slice(i)
+                content = content.slice(0, i) + span + content.slice(i)
                 i += span.length + targetStart.length
             }
-            if(el.innerHTML.substring(i, i + targetEnd.length) === targetEnd) {
+            if(content.substring(i, i + targetEnd.length) === targetEnd) {
                 // insert a span tag
                 const span = `</span>`
-                el.innerHTML = el.innerHTML.slice(0, i + targetEnd.length) + span + el.innerHTML.slice(i + targetEnd.length)
+                content = content.slice(0, i + targetEnd.length) + span + content.slice(i + targetEnd.length)
                 i += span.length + targetEnd.length
             }
         }
+
+        // setResult(content)
 
         // select all spans in the div
         const spans = el.getElementsByTagName('span')
@@ -147,10 +149,6 @@ const App: React.FC = () => {
         document.execCommand('copy')
         // remove the temporary element
         document.body.removeChild(temp)
-
-        setTimeout(() => {
-            el.innerHTML = original
-        }, 3000)
     }
 
     return (
@@ -160,13 +158,13 @@ const App: React.FC = () => {
             <h3>Input:</h3>
             <form id="form" action="/submit" method="post" onSubmit={handleSubmit}>
                 <label htmlFor="a">First set of sequences: (one or more sequences optionally in fasta format)</label>
-                <textarea id="a" value={a} onChange={handleA} rows={5} placeholder="Enter text"></textarea>
+                <textarea disabled={submitDisabled} id="a" value={a} onChange={handleA} rows={5} placeholder="Enter text"></textarea>
 
                 <br/>
                 <br/>
 
                 <label htmlFor="b">Second set of sequences: (one or more sequences optionally in fasta format)</label>
-                <textarea id="b" value={b} onChange={handleB} rows={20} placeholder="Enter text"></textarea>
+                <textarea disabled={submitDisabled} id="b" value={b} onChange={handleB} rows={20} placeholder="Enter text"></textarea>
 
                 <br/>
                 <br/>
